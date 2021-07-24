@@ -1,0 +1,10 @@
+set term wxt
+unset key
+set size ratio -1
+
+plot "data.txt" w l lt 7
+
+set term pdf
+set output "obrazek-trojuhelnik.pdf"
+replot
+set term wxt

@@ -1,0 +1,11 @@
+set term wxt
+unset key
+set size ratio -1
+set grid
+set title "Řetězovky různých délek"
+plot [-2:2] "retezovka.txt" w l lt 6
+
+set term pdf
+set output "obrazek-retezovka.pdf"
+replot
+set term wxt

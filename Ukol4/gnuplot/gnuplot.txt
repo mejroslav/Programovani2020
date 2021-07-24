@@ -1,0 +1,9 @@
+set term wxt
+unset key
+set size square
+plot "data.txt" w l lt 6
+
+set term pdf
+set output "obrazek-hvezda.pdf"
+replot
+set term wxt
