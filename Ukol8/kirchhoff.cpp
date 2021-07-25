@@ -165,12 +165,12 @@ void Obsad (tMatice& Mat, tVektor& Vek, int N) {
     }
 
     // Obsazovani vektoru
-     Vek[N*N-3] = 1;
+     Vek[N*(N-1)] = 1;
 }
 
 
 int main(){
-    const int N = 2;
+    const int N = 3;
     tMatice B = nulovaMatice(N*N-1);
     tVektor I(N*N-1) ;
     Obsad(B,I,N);
