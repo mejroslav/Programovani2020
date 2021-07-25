@@ -5,11 +5,6 @@
 #include <cmath>
 #include <cassert>
 
-// Reseni soustavy   \sum A_ij x_j = b_i
-// jak jsme jej napsali na cviceni doplnene
-// o funkce pocitajici matici A a vektor b.
-// Ty jsou voleny tak, aby byl vysledek tvoren celymi cisly
-
 typedef std::vector<double> tVektor;
 typedef std::vector<tVektor> tMatice;
 
@@ -31,6 +26,7 @@ void vypisMatici(const tMatice m) {
     std::cout << "\n";
 }
 
+// Pro vypsani soustavy ve tvaru Gaussovy eliminace
 void vypisSoustavu(const tMatice m, const tVektor v) {
     for (int r = 0 ; r<m.size(); r++) {
         for (int s = 0 ; s<m[r].size(); s++) {
@@ -43,16 +39,9 @@ void vypisSoustavu(const tMatice m, const tVektor v) {
     std::cout << "\n";
 }
 
+// Kod ze cviceni pro reseni soustavy Ax=b
 tVektor LinearSolve(tMatice A, tVektor b) {
-// parametry hodnotou, abych je mohl menit
-// metoda Gauss-Jordan upravi problem
-//   A x = b
-// na
-//   1 x = b'
-// Pomoci uprav ( radek i = radek A[i], prvek b[i] )
-//   - prehazovani radek
-//   - vynasobeni  radku nenulovou konstanou
-//   - odecteni nasobku radku od jineho
+
 int n = A.size();    
 for (int r = 0 ; r < n; r++) {
     // 1. zaridit vhodny prvek na diagonale
@@ -128,13 +117,6 @@ tMatice maticeSoustavy(int n) {
    return Matice;  
 }
 
-double SpoctiOdpor (tVektor V){
-    double R;
-    for (int i =0; i < V.size(); i++){
-        if (i != V.size()-2) R += 1.0/V[i];
-    }
-    return V[V.size()-2];
-}
 
 
 void Obsad (tMatice& Mat, tVektor& Vek, int N) {
@@ -170,15 +152,27 @@ void Obsad (tMatice& Mat, tVektor& Vek, int N) {
 
 
 int main(){
-    const int N = 3;
+
+    const int N = 3; // pocet radku a sloupcu
+
     tMatice B = nulovaMatice(N*N-1);
     tVektor I(N*N-1) ;
+
     Obsad(B,I,N);
     tVektor Reseni = LinearSolve(B,I);
-    vypisVektor(Reseni);
-    vypisSoustavu(B,I);
 
-    std::cout << "Odpor = " << SpoctiOdpor(Reseni) << "\n";
+    std::cout
+        << "Tento program resi odpory ctvercove site.\n"
+        << "Pocet radku/sloupcu: " << N << "\n\n"
+        << "Matice soustavy:\n";
+    vypisSoustavu(B,I);
+    std::cout << "\n";
+
+    std::cout << "Vektor U:\n";
+    vypisVektor(Reseni);
+    std::cout 
+        << "\n"
+        << "Odpor = " << Reseni[N*(N-1)] << " " << "\n";
 
     return 0;
 }

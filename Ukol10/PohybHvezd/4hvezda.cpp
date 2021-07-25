@@ -3,8 +3,16 @@
 #include <array>
 #include <cmath>
 
+// Funkce pro druhou mocninu
+double sq(double a) {
+    return a * a;
+}
+
 const double Pi = 4 * atan(1.0);
-const double G = 4 * Pi* Pi;
+const double G = 4 * sq(Pi);
+
+double M[4] = {1,1,1,1};
+
 enum I {      // seznam veličin vystupujících v dif. rovnici a jejich celkový počet dim
     X1, Y1, Z1,
     X2, Y2, Z2, 
@@ -16,23 +24,19 @@ enum I {      // seznam veličin vystupujících v dif. rovnici a jejich celkov�
     vx4, vy4, vz4, 
     dim };
 
+
 typedef std::array<double, dim> Vektor;     // typ pro uložení vektorové hodnoty hledané funkce
- 
 typedef Vektor PravaStrana(Vektor U, double t); // typ argumentu následujcící funkce
+typedef void Metoda(PravaStrana PohybRovnice, Vektor &Y, double &t, const double dt); //typ pro ulozeni metody vypoctu
 
-const double M [4] = {1,1,1,1}; // hmotnosti planet uskladnim do tohoto pole 
-
-double sq(double a) {
-    return a * a;
-}
-
-// toto je Eulerova metoda. Konkrétní dif. rovnice se jí podstrčí v prvním argumentu
+// toto je Eulerova metoda
 void step_Euler(PravaStrana PohybRovnice, Vektor &Y, double &t, const double dt) {
     Vektor dYdt = PohybRovnice(Y, t);
     for (int i = 0; i < dim; i++)  Y[i] += dYdt[i]*dt;
     t += dt;
 }
 
+// toto je Runge-Kutta4
 void krok_RK4( PravaStrana pohybovaRovnice,  Vektor &Y, double &t, const double dt) {
 
     Vektor k1_dYdt,k234_dYdt,Ytmp;
@@ -131,6 +135,38 @@ bool jeNasobek(double x, double krok) {
   return fabs(x-krok*round(x/krok)) <= 1E-9*fabs(x); // nepříliš robustní !
 }
 
+void VypisPohyb(Vektor& Y, PravaStrana& pohybovaRovnice, Metoda& krok, double &t, const double tmax, const double dt, const double tvypis = 0.01){
+    std::cout 
+        << "#Pohyb ctyr objektu \n"
+        << "#Pocatecni cas: " << t << "\n"
+        << "#Koncovy cas: " << tmax << "\n";
+    if (krok == step_Euler) std::cout << "#Metoda Euler \n";
+    if (krok == krok_RK4) std::cout << "#Metoda RungeKutta4 \n";
+
+    std::cout
+        << "#Step: " << dt << "\n"
+        << "#Vypisuje po casech " << tvypis << "\n\n";
+    
+    
+    std::cout << "#t \t x1 \t y1 \t z1 \t x2 \t y2 \t z2 \t z1 \t z2 \t x3 \t y3 \t z3 \t x4 \t y4 \t z4 \t E \n"; // Abych se v tom vyznal
+
+    while (t < tmax + 1E-9) {
+
+        if (jeNasobek(t,tvypis)){
+            std::cout << t;
+            for (int i =0; i<dim/2; i++){
+                std::cout << "\t" << Y[i];
+            }
+            std::cout << "\t" << Energie(Y) << "\n";
+        }
+    // Spocitej dalsi hodnotu
+    krok(pohybovaRovnice, Y, t, dt);
+    }
+    std::cout << "\n\n"; 
+}
+
+
+
 int main()
 {   
     //for( double dt = 0.1; dt>0.9E-6; dt*=0.1) { // zkus různě dlouhý krok
@@ -156,28 +192,7 @@ int main()
         };
       
     // Zacni vypisovat pohyb
-
-    std::cout << "#t \t x1 \t y1 \t z1 \t x2 \t y2 \t z2 \t z1 \t z2 \t x3 \t y3 \t z3 \t x4 \t y4 \t z4 \t E \n"; // Abych se v tom vyznal
-
-    while (t < tmax + 1E-9) {  // postupuj v krocích ...
-
-        if (jeNasobek(t,0.01)){
-            std::cout << t;
-            for (int i =0; i<dim/2; i++){
-                std::cout << "\t" << Y[i];
-            }
-            std::cout << "\t" << Energie(Y) << "\n";
-        }
-
-    
-
-    step_Euler(pohybovaRovnicePlanety, Y, t, dt);
-
-	// krok_RK4(pohybovaRovnicePlanety, Y, t, dt);
-      }
-      std::cout << "\n\n";       // začni malovat novou čáru pro nové dt
-
-    //}
+    VypisPohyb(Y, pohybovaRovnicePlanety , krok_RK4, t, tmax, dt);
 
     return 0;
 }

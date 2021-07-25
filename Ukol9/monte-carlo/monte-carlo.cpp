@@ -71,9 +71,7 @@ Vektor3 nahodnyBodVKvadru(double vyska) {
 Vektor3 nahodnyBodVKuloveUseci(double vyska) {
 	Vektor3 bod = nahodnyBodVKvadru(vyska);
 	double R = bod.ctverecDelky();
-
 	if (R <= 1) return bod;
-
 	return nahodnyBodVKuloveUseci(vyska);
 }
 
@@ -83,17 +81,16 @@ Vektor3 tezisteKuloveUsece(double vyska, int pocetBodu) {
 	for (int i = 0; i < pocetBodu; i++) {
 		teziste.pricti(nahodnyBodVKuloveUseci(vyska));
 	}
-
 	teziste.skaluj(1.0/pocetBodu);
-
 	return teziste;
 }
 
-Vektor3 validovaneTeziste(double vyska) {
-	const int N = 10; // pocet pokusu
-	const int POCET_BODU = 1e7; // pocet bodu v kazdem pokusu
-	const double EPSILON = 1e-4;
-
+Vektor3 validovaneTeziste(
+	double vyska,
+	int N, // pocet pokusu
+	int POCET_BODU, // pocet bodu v kazdem pokusu
+	double EPSILON // presnost
+	){
 	SouborVektor3 pokusy (N);
 
 	for (int i=0; i<N; i++){
@@ -103,7 +100,8 @@ Vektor3 validovaneTeziste(double vyska) {
 	}
 
 	Vektor3 prumer = Vektor3::prumer(pokusy);
-	std::cout << "prumer: " << prumer.x << ", " << prumer.y << ", " << prumer.z << "\n";
+	// std::cout << "prumer: " << prumer.x << ", " << prumer.y << ", " << prumer.z << "\n";
+	// pouze pro debug
 	
 	double odchylka = Vektor3::smerodatnaOdchylka(pokusy);
 	double chyba = odchylka / sqrt(N);
@@ -121,16 +119,27 @@ Vektor3 validovaneTeziste(double vyska) {
 }
 
 int main(){
-	
-	std::cout << "Tento program pocita teziste kulove usece se stredem v pocatku \n";
+
 	double vysky[] = {0.25, 0.5, 0.75, 1.0};
+	const int pocet_pokusu = 10;
+	const int pocet_bodu = 1e7;
+	const double presnost = 1e-4;
+
+	std::cout 
+		<< "Tento program pocita teziste kulove usece se stredem v pocatku \n"
+		<< "Pocet pokusu: " << pocet_pokusu << "\n"
+		<< "Pocet bodu v jednom pokusu: " << pocet_bodu << "\n"
+		<< "Presnost: " << presnost << "\n\n"; 
 
 	for (int j = 0; j < 4; j++){
 		std::cout << "Vyska = " << vysky[j] << "\n";
-		Vektor3 Vysledek =  validovaneTeziste(vysky[j]);
-		std::cout << "x = "<< Vysledek.x << ", y = " << Vysledek.y << ", z = " << Vysledek.z << "\n\n";
+		Vektor3 Vysledek =  validovaneTeziste(vysky[j],pocet_pokusu, pocet_bodu, presnost);
+		
+		std::cout 
+			<< "x = "<< Vysledek.x 
+			<< ", y = " << Vysledek.y 
+			<< ", z = " << Vysledek.z 
+			<< "\n\n";
 	}
-	
-
 	return 0;
 }
