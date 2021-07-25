@@ -84,12 +84,12 @@ Vektor pohybovaRovnicePlanety(Vektor U, double t) {
                 + sq(U[j+1]-U[i+1])  // delta y kvadrát
                 + sq(U[j+2]-U[i+2]); // delta z kvadrát
             
-            double Rm3 = pow(sqrt(Rkvadrat), 3);
+            double Rm3 = pow(sqrt(Rkvadrat), -3);
 
             // projdi v kazde castici tri slozky
             for (int k = 0; k < 3; k++){
                 dUdt[I::vx1 + i + k] // dv_(i+k)
-                    += G*M[j/3]*Rm3*(U[j+k] - U[i+k]);
+                    += G*M[j/3]* Rm3 *(U[j+k] - U[i+k]);
             } 
         }
     }
@@ -134,8 +134,8 @@ bool jeNasobek(double x, double krok) {
 int main()
 {   
     //for( double dt = 0.1; dt>0.9E-6; dt*=0.1) { // zkus různě dlouhý krok
-        const double dt = 1E-7;
-        const double tmax = 1;
+        const double dt = 1E-4;
+        const double tmax = 10;
 
         // počáteční čas
         double t = 0;
@@ -164,12 +164,16 @@ int main()
         if (jeNasobek(t,0.01)){
             std::cout << t;
             for (int i =0; i<dim/2; i++){
-             //   std::cout << "\t" << Y[i];
+                std::cout << "\t" << Y[i];
             }
             std::cout << "\t" << Energie(Y) << "\n";
         }
-      
-	  krok_RK4(pohybovaRovnicePlanety, Y, t, dt);
+
+    
+
+    step_Euler(pohybovaRovnicePlanety, Y, t, dt);
+
+	// krok_RK4(pohybovaRovnicePlanety, Y, t, dt);
       }
       std::cout << "\n\n";       // začni malovat novou čáru pro nové dt
 

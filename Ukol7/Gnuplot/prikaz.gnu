@@ -15,11 +15,16 @@ set term gif size 800,800 animate; set output 'puntiky.gif'; do for [k=0:STATS_b
 
 set term gif size 800,800 animate; \
 
+
+
 stats "puntiky.txt" nooutput
 do for [k=0:STATS_blocks-2] { \
+outfile = sprintf("animace/animace%03d.png", k) \
 plot [-80:80][-80:80] "puntiky.txt" \
 index k \
 using 1:2:3:3 \
 with circles palette fs solid; \
-pause 0.1 \
+#pause 0.1 \
 }
+
+
